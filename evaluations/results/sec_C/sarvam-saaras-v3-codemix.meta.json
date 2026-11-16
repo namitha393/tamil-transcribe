@@ -1,0 +1,8 @@
+{
+ "model": "sarvam-saaras-v3-codemix",
+ "device": "cpu",
+ "load_seconds": 6.216601468622684e-05,
+ "threads": 4,
+ "machine": "macOS-26.2-arm64-arm-64bit",
+ "cpu": "arm"
+}

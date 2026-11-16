@@ -1,0 +1,7 @@
+{
+ "model": "whisper-tamil-small",
+ "load_seconds": 54.651669583050534,
+ "threads": 8,
+ "machine": "macOS-26.2-arm64-arm-64bit",
+ "cpu": "arm"
+}

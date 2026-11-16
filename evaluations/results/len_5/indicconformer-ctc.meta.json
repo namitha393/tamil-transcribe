@@ -1,0 +1,7 @@
+{
+ "model": "indicconformer-ctc",
+ "load_seconds": 3.7912722079781815,
+ "threads": 8,
+ "machine": "macOS-26.2-arm64-arm-64bit",
+ "cpu": "arm"
+}

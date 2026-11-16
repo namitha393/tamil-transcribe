@@ -1,0 +1,8 @@
+{
+ "model": "sravaani-tamil",
+ "device": "cpu",
+ "load_seconds": 8.586006083991379,
+ "threads": 8,
+ "machine": "macOS-26.2-arm64-arm-64bit",
+ "cpu": "arm"
+}

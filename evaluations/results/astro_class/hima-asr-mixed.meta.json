@@ -1,0 +1,8 @@
+{
+ "model": "hima-asr-mixed",
+ "device": "cpu",
+ "load_seconds": 4.0671815410023555,
+ "threads": 8,
+ "machine": "macOS-26.2-arm64-arm-64bit",
+ "cpu": "arm"
+}

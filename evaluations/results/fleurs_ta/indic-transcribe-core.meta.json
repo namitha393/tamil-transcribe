@@ -1,0 +1,8 @@
+{
+ "model": "indic-transcribe-core",
+ "device": "mps",
+ "load_seconds": 7.964446625090204,
+ "threads": 8,
+ "machine": "macOS-26.2-arm64-arm-64bit",
+ "cpu": "arm"
+}

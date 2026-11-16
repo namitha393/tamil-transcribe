@@ -1,0 +1,8 @@
+{
+ "model": "sarvam-saaras-v3-translit",
+ "device": "cpu",
+ "load_seconds": 3.558408934623003e-05,
+ "threads": 4,
+ "machine": "macOS-26.2-arm64-arm-64bit",
+ "cpu": "arm"
+}

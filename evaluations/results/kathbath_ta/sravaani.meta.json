@@ -1,0 +1,7 @@
+{
+ "model": "sravaani",
+ "load_seconds": 50.87693833303638,
+ "threads": 8,
+ "machine": "macOS-26.2-arm64-arm-64bit",
+ "cpu": "arm"
+}

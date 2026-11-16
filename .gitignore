@@ -1,0 +1,18 @@
+.venv*/
+__pycache__/
+*.pyc
+.hf_models*/
+.DS_Store
+# audio is never committed (customer recordings, gated datasets)
+*.wav
+*.mp3
+*.m4a
+*.mp4
+*.ogg
+*.opus
+*.flac
+evaluations/data/
+*_transcript/
+# secrets
+.env
+*.key

@@ -1,0 +1,7 @@
+{
+ "model": "indicconformer-rnnt",
+ "load_seconds": 9.07305554090999,
+ "threads": 8,
+ "machine": "macOS-26.2-arm64-arm-64bit",
+ "cpu": "arm"
+}

@@ -1,0 +1,8 @@
+{
+ "model": "indic-transcribe-flex-roman",
+ "device": "mps",
+ "load_seconds": 5.7324315829901025,
+ "threads": 8,
+ "machine": "macOS-26.2-arm64-arm-64bit",
+ "cpu": "arm"
+}

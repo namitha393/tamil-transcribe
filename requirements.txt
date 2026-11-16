@@ -1,0 +1,11 @@
+# Pipeline (what ./transcribe.sh installs). Versions are the ones we tested.
+torch==2.15.0
+transformers==4.57.6
+huggingface_hub==0.36.2
+sentencepiece==0.2.3
+soundfile==0.14.0
+av==19.0.2
+numpy==2.5.4
+# only for the optional --english-detector
+wordfreq==3.1.1
+cmudict==1.1.3
