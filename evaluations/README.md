@@ -11,7 +11,7 @@ All text is normalised the same way for every system (Unicode, punctuation, Tami
 
 | Model | Size | Made by / trained on | Licence & cost | Speed (1 h of audio) |
 |---|---|---|---|---|
-| **SraVaani-1.0** *(chosen)* | 430M | ARTPARK + IISc; trained from scratch on Vaani (65 Indian languages) | MIT, free | **~7 min** on Mac CPU (whole pipeline) |
+| **SraVaani-1.0** *(chosen)* | 430M | ARTPARK + IISc; trained from scratch on Vaani (65 Indian languages) | MIT, free | **~3 min** on an Apple M5 CPU (whole pipeline; 78.6-min class in 2.8 min) |
 | Indic-Transcribe Core | 1.2B | AI4Bharat + Bodhan AI; fine-tune of NVIDIA Canary-1b-v2, 27 languages | Indic Open Model Licence; free, hosting for others needs permission | 80–110 min CPU; 6–9 min Mac GPU |
 | Indic-Transcribe Flex | 1.2B | Same; adds English-in-Latin and Tanglish output modes | same | same |
 | IndicConformer-600M | 600M | AI4Bharat, 22 languages | MIT | ~4 min CPU — **ruled out** (goes blank, see below) |
@@ -96,6 +96,7 @@ The full chronological write-up with every experiment: [FULL_REPORT.md](FULL_REP
 | `lengthtest.py`, `longform_eval.py`, `eval_pipeline_longform.py` | input-length and cutting tests |
 | `dropped_speech.py`, `mixscore.py` | root-cause experiments for missed attendee speech |
 | `eval_tanglish_dakshina.py` | Tanglish converter vs human romanisation |
+| `eval_punctuation.py` | punctuation vs Gemini's and Sarvam's (class sections) |
 | `choose_sections.py`, `profile_audio.py`, `transcript.py` | picking the test sections, profiling the class |
 
 **Re-running** (from this folder):

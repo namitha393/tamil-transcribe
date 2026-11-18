@@ -7,7 +7,7 @@ flowchart TD
     C --> D["<b>3. Transcribe</b> — sravaani.py<br/>SraVaani-1.0, Tamil letters only,<br/>words + timings"]
     D -->|piece came back empty| R[split in two, retry]
     R --> D
-    D --> E["<b>4. Lines</b> — transcribe.py<br/>new line at a 0.6 s pause or after 12 s"]
+    D --> E["<b>4. Punctuation + paragraphs</b> — punctuate.py<br/>full stop at a 0.2 s pause, ? from question forms,<br/>paragraph at a 1 s pause"]
     E --> F["<b>5. Tanglish</b> — tanglish.py<br/>sound rules + word lists"]
     E --> O1[tamil.txt · subtitles.srt · words.json]
     F --> O2[tanglish.txt]
@@ -17,7 +17,8 @@ flowchart TD
 |---|---|
 | `audio.py` | 1 Read audio, 2 Cut |
 | `sravaani.py` | 3 Transcribe (model + fixes) |
-| `transcribe.py` | 4 Lines, saving files, command-line entry point |
+| `punctuate.py` | 4 Punctuation and paragraphs |
+| `transcribe.py` | Saving files, command-line entry point |
 | `tanglish.py` | 5 Tanglish converter and word lists |
 | `english_detect.py` | Optional automatic English-word detector (`--english-detector`) |
 
@@ -64,10 +65,32 @@ We checked whether the model would ever write English words in English letters: 
 probability for English-letter tokens at English words was ≈0, so the Tamil-only rule hides
 nothing.
 
-## 4. Lines
-Words are grouped into lines, starting a new line at a 0.6 s pause or after 12 s. Each line
-gets its start time. (Punctuation and paragraphs: planned — the word timings needed for them
-are saved in `words.json`.)
+## 4. Punctuation and paragraphs
+SraVaani outputs plain words. We add punctuation from the audio and the words:
+
+* **Pauses come from the audio.** SraVaani's word timings have no gaps (each word "ends" where
+  the next begins), so the pause after a word is measured as the longest quiet stretch before
+  the next word starts.
+* **Full stop** after a pause ≥ 0.2 s.
+* **Question mark** instead, if the sentence ends in a Tamil question form (…ங்களா, …லாமா,
+  …ுதா, tags like கரெக்டா / இல்லையா / சரியா) or has a question word near the end
+  (என்ன, எப்படி, ஏன், யாரு…). Address words at the end are skipped (கரெக்டா ஐயா → judged on
+  கரெக்டா), and சரிங்கய்யா ("okay sir") is not a question. A strong question tag ends a sentence
+  after only a 0.1 s pause.
+* **Paragraph** after a pause ≥ 1 s (or once a paragraph passes 60 s) — about 20–30 s each.
+* **No commas**: even Sarvam and Gemini agree on only 10% of commas.
+
+**Tested** against Gemini's and Sarvam's punctuation of the 3 class sections (F1, higher is better):
+
+| Setting | Sentence ends vs Gemini / Sarvam | Question marks vs Gemini / Sarvam |
+|---|--:|--:|
+| *Ceiling: Sarvam vs Gemini* | *73.7* | *76.5* |
+| Full stop at pause ≥ 0.45 s | 52.5 / 46.0 | — |
+| Full stop at pause ≥ 0.2 s | 64.2 / 59.7 | — |
+| **+ question forms + tags end sentences (used)** | **64.8 / 60.4** | **57.2 / 59.7** |
+
+Pause thresholds tried: 0.1–1.0 s (0.2 s balances precision 64% and recall 64%). Paragraph
+pause tried: 0.8–2.0 s. Code: [`../evaluations/eval_punctuation.py`](../evaluations/eval_punctuation.py).
 
 ## 5. Tanglish
 Tanglish = the same Tamil words written in English letters, by sound (not translated):

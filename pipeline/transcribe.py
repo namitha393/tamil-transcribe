@@ -4,13 +4,14 @@ Runs offline on a normal computer's CPU.
     python -m pipeline.transcribe class.mp3 [more files...] [--out folder]
 
 For each input file it writes a folder <file>_transcript/ containing:
-    tamil.txt       the transcript in Tamil letters, one line per spoken stretch, with [h:mm:ss] times
-    tanglish.txt    the same lines in Tanglish (Tamil written in English letters)
-    subtitles.srt   Tamil subtitles (open with the video/audio in VLC etc.)
-    words.json      every word with its start and end time, for later processing
+    tamil.txt       the transcript in Tamil letters, with punctuation and paragraphs;
+                    each paragraph starts with its [h:mm:ss] time
+    tanglish.txt    the same in Tanglish (Tamil written in English letters)
+    subtitles.srt   Tamil subtitles, one sentence each (open with the recording in VLC etc.)
+    words.json      every word with its start time and the pause after it
 
 Components (see pipeline/README.md): read audio -> cut at pauses -> SraVaani
-(Tamil only) -> group words into lines -> Tanglish -> save files.
+(Tamil only) -> punctuation + paragraphs -> Tanglish -> save files.
 """
 from __future__ import annotations
 
@@ -21,22 +22,10 @@ import time
 from pathlib import Path
 
 from .audio import SR, cut, decode
+from .punctuate import paragraphs, pauses, punctuate
 from .tanglish import convert
 
-LINE_GAP = 0.6     # a pause this long (seconds) starts a new line
-LINE_MAX_S = 12.0  # ...and no line is longer than this
-
-
-def group_lines(words: list[dict]) -> list[dict]:
-    """Component 4: words -> readable lines, breaking at pauses."""
-    lines = []
-    for w in words:
-        if lines and w["start"] - lines[-1]["end"] < LINE_GAP and w["end"] - lines[-1]["start"] <= LINE_MAX_S:
-            lines[-1]["text"] += " " + w["w"]
-            lines[-1]["end"] = w["end"]
-        else:
-            lines.append({"start": w["start"], "end": w["end"], "text": w["w"]})
-    return lines
+SUB_MAX_S = 7.0  # subtitles longer than this are split
 
 
 def _ts(s: float, srt: bool = False) -> str:
@@ -44,16 +33,40 @@ def _ts(s: float, srt: bool = False) -> str:
     return f"{h:02d}:{m:02d}:{int(sec):02d},{int((sec % 1) * 1000):03d}" if srt else f"{h}:{m:02d}:{int(sec):02d}"
 
 
-def save(lines: list[dict], words: list[dict], out: Path, tanglish_method: str) -> None:
-    """Components 5 + 6: Tanglish, then write the files."""
+def _tanglish_sentence(s: dict, method: str) -> str:
+    text = convert(" ".join(w["w"] for w in s["words"]), method)
+    return (text[:1].upper() + text[1:] if text else text) + s["mark"]
+
+
+def _subtitles(sents: list[dict]) -> list[tuple[float, float, str]]:
+    subs = []
+    for s in sents:
+        chunk = []
+        for w in s["words"]:
+            chunk.append(w)
+            if w["end"] - chunk[0]["start"] >= SUB_MAX_S and w is not s["words"][-1]:
+                subs.append((chunk[0]["start"], w["end"], " ".join(x["w"] for x in chunk)))
+                chunk = []
+        if chunk:
+            subs.append((chunk[0]["start"], chunk[-1]["end"], " ".join(x["w"] for x in chunk) + s["mark"]))
+    return subs
+
+
+def save(words: list[dict], gaps: list[float], out: Path, tanglish_method: str) -> None:
+    """Components 5 + 6: punctuation/paragraphs and Tanglish, then write the files."""
+    sents = punctuate(words, gaps)
+    paras = paragraphs(sents)
     out.mkdir(parents=True, exist_ok=True)
-    (out / "tamil.txt").write_text("".join(f"[{_ts(l['start'])}] {l['text']}\n" for l in lines), encoding="utf-8")
-    (out / "tanglish.txt").write_text(
-        "".join(f"[{_ts(l['start'])}] {convert(l['text'], tanglish_method)}\n" for l in lines), encoding="utf-8")
+    (out / "tamil.txt").write_text("\n".join(
+        f"[{_ts(p[0]['start'])}] " + " ".join(s["text"] for s in p) + "\n" for p in paras), encoding="utf-8")
+    (out / "tanglish.txt").write_text("\n".join(
+        f"[{_ts(p[0]['start'])}] " + " ".join(_tanglish_sentence(s, tanglish_method) for s in p) + "\n"
+        for p in paras), encoding="utf-8")
     (out / "subtitles.srt").write_text("".join(
-        f"{i}\n{_ts(l['start'], True)} --> {_ts(l['end'], True)}\n{l['text']}\n\n" for i, l in enumerate(lines, 1)),
+        f"{i}\n{_ts(a, True)} --> {_ts(b, True)}\n{t}\n\n" for i, (a, b, t) in enumerate(_subtitles(sents), 1)),
         encoding="utf-8")
-    (out / "words.json").write_text(json.dumps(words, ensure_ascii=False), encoding="utf-8")
+    words_out = [{**w, "pause_after": round(g, 2)} for w, g in zip(words, gaps)]
+    (out / "words.json").write_text(json.dumps(words_out, ensure_ascii=False), encoding="utf-8")
 
 
 def main(argv=None) -> None:
@@ -82,9 +95,8 @@ def main(argv=None) -> None:
         for i, (s, e) in enumerate(pieces, 1):
             words += model.words(y[s:e], s / SR)
             print(f"\r{path.name}: {i}/{len(pieces)} pieces", end="", flush=True)
-        lines = group_lines(words)
         out = (a.out / (path.stem + "_transcript")) if a.out else path.with_name(path.stem + "_transcript")
-        save(lines, words, out, method)
+        save(words, pauses(words, y), out, method)
         print(f"\n{path.name}: {len(y)/SR/60:.1f} min of audio -> {len(words)} words in "
               f"{(time.time()-t0)/60:.1f} min. Saved to: {out}", flush=True)
 

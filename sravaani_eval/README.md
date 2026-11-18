@@ -23,7 +23,7 @@ No audio is stored in this repo (customer recording).
 | B astrology-heavy (5.2 min) | 20.4 | 16.5 | 12.1 |
 | C discussion (4.8 min) | 29.5 | 23.5 | 21.4 |
 
-Full class: 78.6 min → 6,035 words in 9.5 min on a Mac CPU.
+Full class: 78.6 min → 6,035 words, punctuated, in 2.8 min on an Apple M5 CPU.
 
 ## How each pipeline step was chosen (comparisons)
 
@@ -36,6 +36,7 @@ Full class: 78.6 min → 6,035 words in 9.5 min on a Mac CPU.
 | Quiet voices | as-is vs boosting quiet parts 4×/8× | worse (CER 23.1 → 24.5/25.0) | not used |
 | Feature normalisation | whole piece vs sliding 3 s / 6 s | no gain on dropped speech; worse elsewhere | unchanged |
 | Tanglish | letter-by-letter (Aksharamukha), our sound rules v1/v2, + word lists, + English detector, Sarvam translit, Indic-Transcribe-Flex romanised | ours: 64.4% match with human spellings (Aksharamukha 45.5%); 78–83% with Gemini's Tanglish | our rules + word lists |
+| Punctuation | pause thresholds 0.1–1.0 s, + Tamil question forms, + commas | sentence ends F1 65 vs Gemini (ceiling 74), questions 57 (ceiling 77); commas unreliable even between Sarvam & Gemini (10%) | 0.2 s + question forms, no commas |
 | English words | word list only vs automatic detector | detector recovers 30/38 vs 23/38, but ~30% false alarms | list (detector optional) |
 
 End to end (audio → Tanglish, CER vs Gemini's Tanglish, A/B/C): SraVaani + our converter
@@ -101,11 +102,11 @@ astrology glossary.
 ones (சொல்றேன் → சொல்கிறேன்) — a habit from its training transcripts. Minor.
 
 ### 4. Not done yet
-No punctuation/paragraphs; no speaker labels (teacher vs attendee); no human-corrected
-reference yet (all class numbers are vs Gemini).
+Punctuation is rule-based (no commas); no speaker labels (teacher vs attendee); no
+human-corrected reference yet (all class numbers are vs Gemini).
 
 ## Next steps
 1. Customer corrects the 3 sections in [`customer_pack/`](customer_pack/) → true accuracy numbers.
 2. Customer picks output styles ([`customer_pack/output_style_options.md`](customer_pack/output_style_options.md)).
 3. Fine-tune SraVaani on corrected class audio (+ mixed teacher/attendee audio) for weaknesses 1–2.
-4. Punctuation and paragraphs from the saved word timings.
+4. Better punctuation if needed (a punctuation model or an LLM pass), measured with `evaluations/eval_punctuation.py`.
