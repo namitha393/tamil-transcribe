@@ -16,3 +16,4 @@ evaluations/data/
 # secrets
 .env
 *.key
+*.log
