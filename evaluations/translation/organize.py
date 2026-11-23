@@ -14,10 +14,12 @@ ABOUT = {
     "claude-opus-5.5": "Claude Opus 5.5 translating whole paragraphs (stand-in for a cloud LLM API). Written in this "
                        "session from our transcript only; garbled words marked [unclear]. NOTE: the same model also "
                        "judges, and had seen Gemini's transcript earlier — treat as possibly optimistic.",
+    "llm-fresh-paragraph": "LLM translating whole paragraphs from OUR transcript only — a fresh agent that never saw "
+                           "Gemini's transcript (clean stand-in for a cloud LLM API). Garbled words marked [unclear].",
     "indictrans2-200M-sentences": "IndicTrans2 distilled 200M (AI4Bharat, MIT), offline; one sentence at a time.",
     "indictrans2-200M-paragraph": "IndicTrans2 distilled 200M, offline; whole paragraph in one go (max 256 tokens).",
-    "indictrans2-1B-sentences": "IndicTrans2 1B (AI4Bharat, MIT), offline; one sentence at a time.",
-    "indictrans2-1B-paragraph": "IndicTrans2 1B, offline; whole paragraph in one go (max 256 tokens).",
+    "indictrans2-1B-sentences": "IndicTrans2 1B (AI4Bharat, MIT), offline, half precision; one sentence at a time. Stopped after 5 units (memory).",
+    "indictrans2-1B-paragraph": "IndicTrans2 1B, offline, half precision; whole paragraph in one go. Stopped after 5 units (memory).",
     "vaani-t2t-sentences": "gemma4-e2b-vaani-t2t (ARTPARK/IISc, Gemma licence), offline; one sentence at a time.",
     "vaani-t2t-paragraph": "gemma4-e2b-vaani-t2t, offline; whole paragraph in one go.",
 }
